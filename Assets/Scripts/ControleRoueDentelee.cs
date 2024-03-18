@@ -5,6 +5,8 @@ using UnityEngine;
 public class ControleRoueDentelee : MonoBehaviour
 {
     // Start is called before the first frame update
+
+    public AudioClip sonExplosion;
     void Start()
     {
         
@@ -25,6 +27,9 @@ public class ControleRoueDentelee : MonoBehaviour
             // On active l'animation + on la rend non-collide
             GetComponent<Animator>().enabled = true;
             GetComponent<Collider2D>().enabled = false;
+
+            // On joue le son de l'explosion
+            GetComponent<AudioSource>().PlayOneShot(sonExplosion);
             
             // On arrete la roue 
             GetComponent<Rigidbody2D>().velocity = Vector2.zero;
