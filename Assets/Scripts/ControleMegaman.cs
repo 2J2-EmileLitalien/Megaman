@@ -19,6 +19,10 @@ public class ControleMegaman : MonoBehaviour
     // Variables de son
     public AudioClip sonMort;
 
+    // Variables d'attaque
+    private bool peutAttaquer = true;
+    public float vitesseMaximale;
+
 
 
     // Start is called before the first frame update
@@ -63,6 +67,15 @@ public class ControleMegaman : MonoBehaviour
                 mouvement.y = GetComponent<Rigidbody2D>().velocity.y;
             }
 
+            // Si barre espace appuyer + il peut attaquer + saut est faux (Devient vrai car le ! inverse le resultat, ce qui permet la if grace au &&)
+            if (Input.GetKeyDown(KeyCode.Space) && peutAttaquer && !(GetComponent<Animator>().GetBool("Saut")))
+            {
+                peutAttaquer = false;
+                GetComponent<Animator>().SetBool("Saut", false);
+                GetComponent<Animator>().SetBool("Attaque", true);
+                Invoke("finAttaque", 0.5f);
+            }
+
             // Animation marche ou non selon la vitesse du personnage
             if (Mathf.Abs(GetComponent<Rigidbody2D>().velocity.x) > 0.9)
             {
@@ -74,7 +87,11 @@ public class ControleMegaman : MonoBehaviour
         
 
       
-
+            // Appliquer la velociter 
+            if (peutAttaquer == false && (Mathf.Abs(vitesseX) <= vitesseMaximale) )
+            {
+                mouvement.x *= 2f;
+            }
             GetComponent<Rigidbody2D>().velocity = mouvement;
         }
     }
@@ -88,37 +105,50 @@ public class ControleMegaman : MonoBehaviour
         
         // Declencheur de mort = Ennemis. Repetitif si on les nommes tous avec .name donc on a ajouter un tag. Ici Niveau1 car un Ennemi du 2eme Niveau pourrait donner une mort differente
         if (collision.gameObject.tag == "EnnemiNiveau1")
-        {
-            // Lancer animation de mort && le son de mort 
-            GetComponent<Animator>().SetBool("Mort", true);
-
-            GetComponent<AudioSource>().PlayOneShot(sonMort);
-
-            // Desactiver mouvements
-            enVie = false;
-
-            // Quand Megaman se fait toucher, ajouter le fait qu'il se fasse pousser (Comme dans Sonic fait en classe)
-
-            // Si ennemi a droite de Megaman
-            if (transform.position.x < collision.gameObject.transform.position.x)
+        { 
+            if (peutAttaquer) // Si peut attaquer (Donc n'attaque pas actuellement
             {
-                GetComponent<Rigidbody2D>().velocity = new Vector2(-10, 10);
+                // Lancer animation de mort && le son de mort 
+                GetComponent<Animator>().SetBool("Mort", true);
 
-                // Sinon (Il est donc a gauche de Megaman)
-            } else
-            {
-                GetComponent<Rigidbody2D>().velocity = new Vector2(10, 10);
-            }
+                GetComponent<AudioSource>().PlayOneShot(sonMort);
 
-            // Reset la scene
-            Invoke("resetScene", 2f);
+                // Desactiver mouvements
+                enVie = false;
+
+                // Quand Megaman se fait toucher, ajouter le fait qu'il se fasse pousser (Comme dans Sonic fait en classe)
+
+                // Si ennemi a droite de Megaman
+                if (transform.position.x < collision.gameObject.transform.position.x)
+                {
+                    GetComponent<Rigidbody2D>().velocity = new Vector2(-10, 10);
+
+                    // Sinon (Il est donc a gauche de Megaman)
+                } else
+                {
+                    GetComponent<Rigidbody2D>().velocity = new Vector2(10, 10);
+                }
+
+                // Reset la scene
+                Invoke("resetScene", 2f);
             
+            } else // Megaman est en attaque -> Ennemi meurt
+            {
+                collision.gameObject.GetComponent<Animator>().SetBool("Mort", true);
+                Destroy(collision.gameObject, 0.7f);
+            }
         }
     }
 
     void resetScene()
     {
         SceneManager.LoadScene("Megaman");
+    }
+
+    void finAttaque()
+    {
+        peutAttaquer = true;
+        GetComponent<Animator>().SetBool("Attaque", false);
     }
 }
 
