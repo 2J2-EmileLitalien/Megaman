@@ -14,6 +14,7 @@ public class GestionFinMort : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
+        textePointageFinal.text = ControleMegaman.score + " points";
         texteTempsRestant.text = "Ça recommence dans: "+tempsRestant+" secondes";
         Invoke("updateTemps", 1f);
     }
@@ -21,11 +22,19 @@ public class GestionFinMort : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        // SCENE QUI SE RELANCE AVEC BARRE D'ESPACE
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            print("Barre espace appuyer!");
+            Invoke("relanceScene", 0f);
+        }
     }
 
     void updateTemps()
     {
+
+
+        // SCENE QUI SE RELANCE APRES 10 SECONDES (BONUS)
         tempsRestant -= 1;
         // Change le texte au pluriel ou singulier 
         if (tempsRestant == 1)
@@ -44,8 +53,15 @@ public class GestionFinMort : MonoBehaviour
         } else
         {
             tempsRestant = 10;
-            SceneManager.LoadScene("Megaman");
+            Invoke("relanceScene", 0f);
         }
+    }
+
+
+    void relanceScene()
+    {
+        print("Fin mort: On relance la scene!");
+        SceneManager.LoadScene("Megaman");
     }
 
 }

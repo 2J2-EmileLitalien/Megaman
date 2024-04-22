@@ -14,5 +14,8 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/FinMort.unity
     guid: 89946d36fabc84f4c97754d782a5444d
+  - enabled: 1
+    path: Assets/Scenes/FinGagne.unity
+    guid: c66cbf800ca4733419400af16e5a7737
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0

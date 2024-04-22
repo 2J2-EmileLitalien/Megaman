@@ -7,6 +7,9 @@ TagManager:
   - plateforme
   - detail
   - EnnemiNiveau1
+  - vide
+  - Point petit
+  - trophee
   layers:
   - Default
   - TransparentFX

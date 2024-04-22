@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using TMPro;
 using UnityEditor.Experimental.GraphView;
 using UnityEditor.SearchService;
 using UnityEngine;
@@ -24,21 +25,27 @@ public class ControleMegaman : MonoBehaviour
     private bool peutAttaquer = true;
     public float vitesseMaximale;
 
-    // Variables pour les balles 
+    // Variables pour les balles (Projectiles)
     public GameObject balleOriginale;
     public AudioClip sonBalle;
+
+    // Variables pour les points
+    public TextMeshProUGUI pointageTexte;
+    public static float score = 0;
+    public static float highscore;
 
 
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        score = 0;
     }
 
     // Update is called once per frame
     void Update()
     {
+        // Tous ce que Megaman peut faire quand il est en vie 
         if (enVie) {
 
             if (Input.GetKey(KeyCode.D))
@@ -110,6 +117,15 @@ public class ControleMegaman : MonoBehaviour
             // Appliquer la velociter 
             GetComponent<Rigidbody2D>().velocity = mouvement;
         }
+
+
+        // Script qui update le highscore 
+
+        // Change le highscore si score est plus haut
+        if (score > highscore)
+        {
+            highscore = score;
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
@@ -156,6 +172,40 @@ public class ControleMegaman : MonoBehaviour
         }
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.gameObject.tag == "vide")
+        {
+            // Lancer animation de mort && le son de mort 
+            GetComponent<Animator>().SetBool("Mort", true);
+
+            GetComponent<AudioSource>().PlayOneShot(sonMort);
+
+
+            // Desactiver mouvements
+            enVie = false;
+
+            // Changement a la scene de mort 
+            Invoke("finMort", 1.5f);
+        }
+
+        if (collision.gameObject.tag == "trophee")
+        {
+            // Changement a la scene de victoire
+            Invoke("finGagne", 1.5f);
+        }
+
+
+        if (collision.gameObject.tag == "Point petit")
+        {
+            score += 1;
+            pointageTexte.text = "Points: " + score;
+            collision.gameObject.SetActive(false);
+
+        }
+
+    }
+
     void LancerBombe()
     {
         GetComponent<Animator>().SetBool("tireBalle", true);
@@ -186,6 +236,12 @@ public class ControleMegaman : MonoBehaviour
     void finMort()
     {
         SceneManager.LoadScene("FinMort");
+    }
+
+
+    void finGagne()
+    {
+        SceneManager.LoadScene("FinGagne");
     }
 }
 
